@@ -29,7 +29,7 @@ app.use(dashboard({
     topic: 'hystrix:metrics' // <<< configurable hystrix metrics topic
 }));
 
-app.listen(8000); //  http://localhost:8080/hystrix
+app.listen(8000); //  http://localhost:8000/hystrix
 ```
 
 The stream will can be served by /hystrix.stream if this module is used within the same runtime where service metrics is generated.
