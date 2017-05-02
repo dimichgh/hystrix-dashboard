@@ -26,7 +26,7 @@ const app = express();
 const dashboard = require('hystrix-dashboard');
 
 app.use(dashboard({
-    topic: 'hystrix:metrics' // <<< configurable hystrix metrics topic
+    topic: 'hystrix:metrics' // <<< configurable hystrix metrics topic.
 }));
 
 app.listen(8000); //  http://localhost:8080/hystrix
