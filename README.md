@@ -4,6 +4,12 @@ hystrix-dashboard
 The module provides UI part from hystrix java dashboard that can be used as part nodejs application.
 For convenience, it also provides a publisher /hystrix.stream and a proxy /proxy.stream
 
+[![codecov](https://codecov.io/gh/dimichgh/hystrix-dashboard/branch/master/graph/badge.svg)](https://codecov.io/gh/dimichgh/hystrix-dashboard)
+[![Build Status](https://travis-ci.org/dimichgh/hystrix-dashboard.svg?branch=master)](https://travis-ci.org/dimichgh/hystrix-dashboard) [![NPM](https://img.shields.io/npm/v/hystrix-dashboard.svg)](https://www.npmjs.com/package/hystrix-dashboard)
+[![Downloads](https://img.shields.io/npm/dm/hystrix-dashboard.svg)](http://npm-stat.com/charts.html?package=hystrix-dashboard)
+[![Known Vulnerabilities](https://snyk.io/test/github/dimichgh/hystrix-dashboard/badge.svg)](https://snyk.io/test/github/dimichgh/hystrix-dashboard)
+
+
 ### Install
 
 ```bash

@@ -41,26 +41,26 @@ describe(__filename, () => {
                     data.push(chunk);
                 })
                 .on('end', () => {
-                    Assert.deepEqual([ 'data: chunk:0\n\n',
-                      'data: chunk:1\n\n',
-                      'data: chunk:2\n\n',
-                      'data: chunk:3\n\n',
-                      'data: chunk:4\n\n',
-                      'data: chunk:5\n\n',
-                      'data: chunk:6\n\n',
-                      'data: chunk:7\n\n',
-                      'data: chunk:8\n\n',
-                      'data: chunk:9\n\n',
-                      'data: chunk:10\n\n',
-                      'data: chunk:11\n\n',
-                      'data: chunk:12\n\n',
-                      'data: chunk:13\n\n',
-                      'data: chunk:14\n\n',
-                      'data: chunk:15\n\n',
-                      'data: chunk:16\n\n',
-                      'data: chunk:17\n\n',
-                      'data: chunk:18\n\n',
-                      'data: chunk:19\n\n' ], data);
+                    Assert.deepEqual([ 'data: {"chunk":0}\n\n',
+                      'data: {"chunk":1}\n\n',
+                      'data: {"chunk":2}\n\n',
+                      'data: {"chunk":3}\n\n',
+                      'data: {"chunk":4}\n\n',
+                      'data: {"chunk":5}\n\n',
+                      'data: {"chunk":6}\n\n',
+                      'data: {"chunk":7}\n\n',
+                      'data: {"chunk":8}\n\n',
+                      'data: {"chunk":9}\n\n',
+                      'data: {"chunk":10}\n\n',
+                      'data: {"chunk":11}\n\n',
+                      'data: {"chunk":12}\n\n',
+                      'data: {"chunk":13}\n\n',
+                      'data: {"chunk":14}\n\n',
+                      'data: {"chunk":15}\n\n',
+                      'data: {"chunk":16}\n\n',
+                      'data: {"chunk":17}\n\n',
+                      'data: {"chunk":18}\n\n',
+                      'data: {"chunk":19}\n\n' ], data);
                     next();
                 });
             })
@@ -69,12 +69,12 @@ describe(__filename, () => {
 
             setTimeout(() => {
                 for (var i = 0; i < 10; i++) {
-                    process.emit('hystrix:metrics', `chunk:${i}`);
+                    process.emit('hystrix:metrics', `{"chunk":${i}}`);
                 }
 
                 setTimeout(() => {
                     for (; i < 20; i++) {
-                        process.emit('hystrix:metrics', `chunk:${i}`);
+                        process.emit('hystrix:metrics', {chunk:i});
                     }
 
                     setTimeout(() => {

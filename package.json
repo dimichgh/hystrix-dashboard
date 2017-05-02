@@ -1,11 +1,12 @@
 {
   "name": "hystrix-dashboard",
   "version": "1.0.0",
-  "description": "a UI part of java hystrix dashboard for nodejs apps",
+  "description": "A UI part of java hystrix dashboard for nodejs apps",
   "main": "index.js",
   "scripts": {
-    "preinstall": "rm -rf Hystrix && rm -rf webapp && git clone https://github.com/Netflix/Hystrix && cd Hystrix && git checkout d3e099121127dc9a2748c5d581794cd9e3867b6a && cd .. && cp -r ./Hystrix/hystrix-dashboard/src/main/webapp .",
-    "test": "./node_modules/.bin/mocha test"
+    "preinstall": "rm -rf Hystrix && rm -rf webapp && git clone -n https://github.com/Netflix/Hystrix && cd Hystrix && git checkout d3e099121127dc9a2748c5d581794cd9e3867b6a && cd .. && cp -r ./Hystrix/hystrix-dashboard/src/main/webapp .",
+    "test": "./node_modules/.bin/mocha test",
+    "test-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "homepage": "https://github.com/dimichgh/hystrix-dashboard#readme",
   "devDependencies": {
     "express": "^4.15.2",
+    "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
     "supertest": "^3.0.0"
   },

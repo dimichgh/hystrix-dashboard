@@ -24,7 +24,10 @@ describe(__filename, () => {
 
         const sourceApp = express();
         const source = sourceApp.use((req, res) => {
-            proxy(req, res);
+            const proxyReq = proxy(req, res);
+            if (req.query.error) {
+                proxyReq.emit('error', new Error('Boom'));
+            }
         })
         .listen(err => {
             Assert.ok(!err, err && err.stack);
@@ -131,8 +134,6 @@ describe(__filename, () => {
                     next(err);
                     return;
                 }
-                body = body.toString();
-                Assert.ok(body.indexOf('Host info') !== -1);
                 next();
             });
         });
@@ -160,8 +161,32 @@ describe(__filename, () => {
                     next(err);
                     return;
                 }
-                body = body.toString();
-                Assert.ok(body.indexOf('Host info') !== -1);
+                next();
+            });
+        });
+
+    });
+
+    it('should handle unknown error', next => {
+        proxy = prxy({
+        });
+
+        const origin = `http://localhost:${targetPort}`;
+        Wreck.request('GET', `http://localhost:${sourcePort}?origin=${origin}&error=true`, {
+            headers: {
+                foo: 'bar',
+                qaz: 'wsx',
+                host: 'www.ebay.com'
+            }
+        }, (err, res) => {
+            Assert.ok(!err, err && err.stack);
+            Assert.equal(500, res.statusCode);
+            Assert.equal('Unknown error', res.statusMessage);
+            Wreck.read(res, null, function onResponseRead(err, body) {
+                if (err) {
+                    next(err);
+                    return;
+                }
                 next();
             });
         });

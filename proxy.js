@@ -43,11 +43,11 @@ module.exports = function createProxy(config) {
             if (err.code === 'ETIMEDOUT' || err.code === 'ECONNRESET') {
                 res.writeHead(504, `Gateway timeout`);
                 delete requestOptions.payload;
-                res.write(`Host info ${JSON.stringify(requestOptions, null, '  ')}`);
+                console.log(`[ERROR] Host info ${JSON.stringify(requestOptions, null, '  ')}`);
             }
             else {
                 res.writeHead(500, 'Unknown error');
-                res.write(err.stack);
+                console.log('[ERROR]', err.stack);
             }
             res.end();
         });

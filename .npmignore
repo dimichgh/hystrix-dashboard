@@ -6,3 +6,4 @@ test
 .atom-build.json
 .git
 Hystrix
+coverage
