@@ -1,0 +1,8 @@
+.jshintrc
+Makefile
+.jshintignore
+doc
+test
+.atom-build.json
+.git
+Hystrix

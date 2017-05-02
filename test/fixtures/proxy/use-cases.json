@@ -1,0 +1,47 @@
+{
+    "/get": {
+        "incomming": {
+            "headers": {
+                "foo": "bar",
+                "qaz": "wsx"
+            }
+        },
+        "outgoing": {
+            "statusCode": 200,
+            "headers": {
+                "rfv": "tgb",
+                "qwe": "ert"
+            },
+            "body": "Hello World"
+        }
+    },
+    "/timeout": {
+        "outgoing": {
+            "type": "timeout"
+        }
+    },
+    "/chunk-and-timeout": {
+        "outgoing": {
+            "type": "chunk-and-timeout",
+            "statusCode": 200,
+            "headers": {
+                "rfv": "tgb",
+                "qwe": "ert"
+            },
+            "chunk": "Hello World"
+        }
+    },
+    "/post": {
+        "outgoing": {
+            "type": "echo"
+        }
+    },
+    "/redirect": {
+        "outgoing": {
+            "statusCode": 403,
+            "headers": {
+                "location": "http://some.link/"
+            }
+        }
+    }
+}

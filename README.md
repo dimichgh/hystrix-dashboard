@@ -44,4 +44,3 @@ hystrixStream.toObservable().subscribe(
 ```
 
 For a real example, you can look at how [trooba-hystrix-handler](https://github.com/trooba/trooba-hystrix-handler) uses it to expose trooba pipeline service metrics.
-# hystrix-dashboard
