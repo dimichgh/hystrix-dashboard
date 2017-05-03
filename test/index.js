@@ -2,12 +2,18 @@
 
 const Assert = require('assert');
 const Http = require('http');
-const app = require('..');
+const express = require('express');
 const supertest = require('supertest');
+
+const app = express();
+const proxy = require('../proxy');
+app.use('/proxy.stream', proxy());
+
+const dashboard = require('..')(app);
 
 describe(__filename, () => {
     it('should start the server', next => {
-        supertest(app())
+        supertest(dashboard)
         .get('/')
         .end((err, res) => {
             Assert.ok(!err, err && err.stack);
@@ -21,7 +27,7 @@ describe(__filename, () => {
         let port;
 
         before(next => {
-            let svr = app().listen(() => {
+            let svr = dashboard.listen(() => {
                 port = svr.address().port;
                 next();
             });
@@ -91,7 +97,7 @@ describe(__filename, () => {
         let port;
 
         before(next => {
-            let svr = app().listen(() => {
+            let svr = dashboard.listen(() => {
                 port = svr.address().port;
                 next();
             });

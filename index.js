@@ -2,10 +2,12 @@
 
 const NodePath = require('path');
 const express = require('express');
-const proxy = require('./proxy');
 
-module.exports = function configure(config) {
-    const app = express();
+module.exports = function configure(config, app) {
+    if (config && config.use) {
+        app = config;
+    }
+    app = app || express();
     const topic = config && config.topic || 'hystrix:metrics';
 
     app.use('/hystrix.stream', function hystrixStreamResponse(request, response) {
@@ -33,8 +35,6 @@ module.exports = function configure(config) {
         response.once('close', cleanAll);
         response.once('finish', cleanAll);
     });
-
-    app.use('/proxy.stream', proxy(config && config.proxy));
 
     app.use('/', express.static(NodePath.join(__dirname, './webapp')));
 
