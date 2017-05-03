@@ -8,7 +8,7 @@ const supertest = require('supertest');
 describe(__filename, () => {
     it('should start the server', next => {
         supertest(app())
-        .get('/hystrix/')
+        .get('/')
         .end((err, res) => {
             Assert.ok(!err, err && err.stack);
             Assert.equal(200, res.statusCode);

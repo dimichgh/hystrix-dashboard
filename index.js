@@ -20,6 +20,10 @@ module.exports = function configure(config) {
             response.write('data: ' + data + '\n\n');
         };
 
+        setInterval(() => {
+            response.write(':ping\n\n');
+        }, 4000).unref();
+
         process.on(topic, listener);
 
         const cleanAll = () => process.removeListener(topic, listener);
@@ -32,7 +36,7 @@ module.exports = function configure(config) {
 
     app.use('/proxy.stream', proxy(config && config.proxy));
 
-    app.use('/hystrix', express.static(NodePath.join(__dirname, './webapp')));
+    app.use('/', express.static(NodePath.join(__dirname, './webapp')));
 
     return app;
 };
