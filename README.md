@@ -32,9 +32,9 @@ app.use(dashboard({
 app.listen(8000); //  http://localhost:8000/hystrix
 ```
 
-The stream will can be served by /hystrix.stream if this module is used within the same runtime where service metrics is produced.
+The stream can be served by /hystrix.stream if this module is used within the same runtime where service metrics is produced.
 
-The stream will listen on process events with the configured topic (by default it will use 'hystrix:metrics'.)
+The hystrix stream will listen to process events with the configured topic (by default it will use 'hystrix:metrics'.)
 
 Here's an example how you can link dashboard to the real metrics for services based on [hystrixjs](https://www.npmjs.com/package/hystrixjs) module provided that both components are part of the same runtime:
 
