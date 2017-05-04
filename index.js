@@ -24,7 +24,7 @@ module.exports = function configure(config, app) {
 
         setInterval(() => {
             response.write(':ping\n\n');
-        }, 4000).unref();
+        }, config && config.idleTimeout || 4000).unref();
 
         process.on(topic, listener);
 

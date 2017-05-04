@@ -9,10 +9,10 @@ const app = express();
 const proxy = require('../proxy');
 app.use('/proxy.stream', proxy());
 
-const dashboard = require('..')(app);
-
 describe(__filename, () => {
     it('should start the server', next => {
+        const dashboard = require('..')(app);
+
         supertest(dashboard)
         .get('/')
         .end((err, res) => {
@@ -23,10 +23,52 @@ describe(__filename, () => {
         });
     });
 
+    describe('should emit ping when idle', () => {
+        let port;
+
+        before(next => {
+            const dashboard = require('..')({
+                idleTimeout: 100
+            }, app);
+
+            let svr = dashboard.listen(() => {
+                port = svr.address().port;
+                next();
+            });
+        });
+
+        it('should get idle ping', function (next) {
+
+            let data = [];
+            const req = Http.get(`http://localhost:${port}/hystrix.stream`, res => {
+                const statusCode = res.statusCode;
+                const contentType = res.headers['content-type'];
+
+                Assert.equal(200, statusCode);
+                Assert.equal('text/event-stream;charset=UTF-8', contentType);
+
+                res.setEncoding('utf8');
+                res.on('data', chunk => {
+                    data.push(chunk);
+                })
+                .on('end', () => {
+                    Assert.ok(data.length);
+                    data.forEach(d => Assert.equal(':ping\n\n', d));
+                    next();
+                });
+            })
+            .once('error', next);
+
+            setTimeout(() => req.abort(), 500);
+        });
+    });
+
     describe('should emit metrics via topic into stream', () => {
         let port;
 
         before(next => {
+            const dashboard = require('..')(app);
+
             let svr = dashboard.listen(() => {
                 port = svr.address().port;
                 next();
@@ -97,6 +139,8 @@ describe(__filename, () => {
         let port;
 
         before(next => {
+            const dashboard = require('..')(app);
+
             let svr = dashboard.listen(() => {
                 port = svr.address().port;
                 next();
