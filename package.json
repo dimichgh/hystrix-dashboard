@@ -4,8 +4,9 @@
   "description": "A UI part of java hystrix dashboard for nodejs apps",
   "main": "index.js",
   "scripts": {
-    "preinstall": "rm -rf Hystrix && rm -rf webapp && git clone -n https://github.com/Netflix/Hystrix && cd Hystrix && git checkout d3e099121127dc9a2748c5d581794cd9e3867b6a && cd .. && cp -r ./Hystrix/hystrix-dashboard/src/main/webapp .",
-    "test": "./node_modules/.bin/mocha test",
+    "update-hystrix": "rm -rf Hystrix && rm -rf webapp && git clone -n https://github.com/Netflix/Hystrix && cd Hystrix && git checkout d3e099121127dc9a2748c5d581794cd9e3867b6a && cd .. && cp -r ./Hystrix/hystrix-dashboard/src/main/webapp .",
+    "prepublishOnly": "npm run update-hystrix",
+    "test": "npm run update-hystrix && ./node_modules/.bin/mocha test",
     "test-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec"
   },
   "repository": {
