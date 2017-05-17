@@ -5,12 +5,11 @@ const Http = require('http');
 const express = require('express');
 const supertest = require('supertest');
 
-const app = express();
 const proxy = require('../proxy');
-app.use('/proxy.stream', proxy());
 
 describe(__filename, () => {
     it('should start the server', next => {
+        const app = express();
         const dashboard = require('..')(app);
 
         supertest(dashboard)
@@ -25,6 +24,8 @@ describe(__filename, () => {
 
     describe('should emit ping when idle', () => {
         let port;
+        const app = express();
+        app.use('/proxy.stream', proxy());
 
         before(next => {
             const dashboard = require('..')({
@@ -57,7 +58,7 @@ describe(__filename, () => {
                     next();
                 });
             })
-            .once('error', next);
+            .once('error', err => {});
 
             setTimeout(() => req.abort(), 500);
         });
@@ -65,6 +66,7 @@ describe(__filename, () => {
 
     describe('should emit metrics via topic into stream', () => {
         let port;
+        const app = express();
 
         before(next => {
             const dashboard = require('..')(app);
@@ -137,6 +139,8 @@ describe(__filename, () => {
 
     describe('should proxy the hystrix stream', next => {
         let port;
+        const app = express();
+        app.use('/proxy.stream', proxy());
 
         before(next => {
             const dashboard = require('..')(app);

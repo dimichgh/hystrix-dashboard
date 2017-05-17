@@ -6,6 +6,7 @@ const express = require('express');
 module.exports = function configure(config, app) {
     if (config && config.use) {
         app = config;
+        config = undefined;
     }
     app = app || express();
     const topic = config && config.topic || 'hystrix:metrics';
