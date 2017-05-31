@@ -18,7 +18,7 @@ npm install hystrix-dashboard -S
 
 ### Usage
 
-Expose it as part of your express app under /hystrix
+One can expose it as part of your express app under /hystrix
 
 ```js
 const express = require('express');
@@ -26,27 +26,15 @@ const app = express();
 const dashboard = require('hystrix-dashboard');
 
 app.use(dashboard({
-    topic: 'hystrix:metrics' // <<< configurable hystrix metrics topic
+    idleTimeout: 4000,  // will emit "ping if no data comes within 4 seconds,
+    interval: 2000      // interval to collect metrics
 }));
 
 app.listen(8000); //  http://localhost:8000/hystrix
 ```
 
-The stream can be served by /hystrix.stream if this module is used within the same runtime where service metrics is produced.
+The metrics SSE stream can be served by /hystrix.stream if this module is used within the same runtime where service metrics is produced.
 
-The hystrix stream will listen to process events published under a configureable topic (by default it will use 'hystrix:metrics'.)
-
-Here's an example how you can link dashboard to the real metrics for services based on [hystrixjs](https://www.npmjs.com/package/hystrixjs) module provided that both components are part of the same runtime:
-
-```js
-const hystrixStream = require('hystrixjs').hystrixSSEStream;
-
-hystrixStream.toObservable().subscribe(
-    // publish metrics under hystrix:metrics
-    sseData => process.emit('hystrix:metrics', sseData),
-    err => {},
-    () => {}
-);
-```
+The hystrix stream will will detect all hystrix modules loaded into require.cache and start observing them for any metrics available.
 
 For a real example, you can look at how [trooba-hystrix-handler](https://github.com/trooba/trooba-hystrix-handler) uses it to expose trooba pipeline service metrics.
