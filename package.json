@@ -7,6 +7,7 @@
     "update-hystrix": "rm -rf Hystrix && rm -rf webapp && git clone -n https://github.com/Netflix/Hystrix && cd Hystrix && git checkout d3e099121127dc9a2748c5d581794cd9e3867b6a && cd .. && cp -r ./Hystrix/hystrix-dashboard/src/main/webapp .",
     "prepublish": "npm run update-hystrix",
     "test": "npm run update-hystrix && ./node_modules/.bin/mocha test",
+    "test-only": "./node_modules/.bin/mocha test",
     "test-coverage": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec"
   },
   "repository": {
@@ -26,12 +27,18 @@
   "homepage": "https://github.com/dimichgh/hystrix-dashboard#readme",
   "devDependencies": {
     "express": "^4.15.2",
+    "hystrixjs": "^0.2.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
     "supertest": "^3.0.0"
   },
   "dependencies": {
+    "async": "^2.4.1",
     "hoek": "^4.1.1",
+    "rxjs": "^5.4.0",
     "wreck": "^12.1.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   }
 }

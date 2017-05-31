@@ -4,10 +4,45 @@ const Assert = require('assert');
 const Http = require('http');
 const express = require('express');
 const supertest = require('supertest');
+const Index = require('..');
 
 const proxy = require('../proxy');
 
 describe(__filename, () => {
+
+    describe('Utils', () => {
+        after(() => {
+            delete require.cache[require.resolve('hystrixjs')];
+            delete require.cache[require.resolve('./fixtures/hystrix-mock/node_modules/hystrixjs/index')];
+            delete require.cache[require.resolve('./fixtures/hystrix-mock/mock1')];
+        });
+
+        it('should not find hystrixjs', next => {
+            Index.Utils.findHystrixModules(list => {
+                Assert.equal(0, list.length);
+                next();
+            });
+        });
+
+        it('should find one module', next => {
+            require('hystrixjs');
+            Index.Utils.findHystrixModules(list => {
+                Assert.equal(1, list.length);
+                Assert.ok(/node_modules\/hystrixjs\/index.js$/.test(list[0]));
+                next();
+            });
+        });
+
+        it('should find two modules', next => {
+            require('./fixtures/hystrix-mock/node_modules/hystrixjs/index');
+            Index.Utils.findHystrixModules(list => {
+                Assert.equal(2, list.length);
+                Assert.ok(/node_modules\/hystrixjs\/index.js$/.test(list[0]));
+                next();
+            });
+        });
+    });
+
     it('should start the server', next => {
         const app = express();
         const dashboard = require('..')(app);
@@ -26,11 +61,14 @@ describe(__filename, () => {
         let port;
         const app = express();
         app.use('/proxy.stream', proxy());
+        let _findHystrixModules;
 
         before(next => {
-            const dashboard = require('..')({
+            _findHystrixModules = Index.Utils.findHystrixModules;
+
+            const dashboard = require('..')(app, {
                 idleTimeout: 100
-            }, app);
+            });
 
             let svr = dashboard.listen(() => {
                 port = svr.address().port;
@@ -38,7 +76,14 @@ describe(__filename, () => {
             });
         });
 
+        after(() => {
+            Index.Utils.findHystrixModules = _findHystrixModules;
+        });
+
         it('should get idle ping', function (next) {
+            Index.Utils.findHystrixModules = callback => callback([
+                require.resolve('./fixtures/hystrix-mock/mock1.js')
+            ]);
 
             let data = [];
             const req = Http.get(`http://localhost:${port}/hystrix.stream`, res => {
@@ -69,7 +114,9 @@ describe(__filename, () => {
         const app = express();
 
         before(next => {
-            const dashboard = require('..')(app);
+            const dashboard = require('..')(app, {
+                interval: 300
+            });
 
             let svr = dashboard.listen(() => {
                 port = svr.address().port;
@@ -78,6 +125,8 @@ describe(__filename, () => {
         });
 
         it('test', function (next) {
+            const Hystrix = require('hystrixjs');
+
             let data = [];
             const req = Http.get(`http://localhost:${port}/hystrix.stream`, res => {
                 const statusCode = res.statusCode;
@@ -91,27 +140,14 @@ describe(__filename, () => {
                     data.push(chunk);
                 })
                 .on('end', () => {
-                    Assert.deepEqual([ 'data: {"chunk":0}\n\n',
-                      'data: {"chunk":1}\n\n',
-                      'data: {"chunk":2}\n\n',
-                      'data: {"chunk":3}\n\n',
-                      'data: {"chunk":4}\n\n',
-                      'data: {"chunk":5}\n\n',
-                      'data: {"chunk":6}\n\n',
-                      'data: {"chunk":7}\n\n',
-                      'data: {"chunk":8}\n\n',
-                      'data: {"chunk":9}\n\n',
-                      'data: {"chunk":10}\n\n',
-                      'data: {"chunk":11}\n\n',
-                      'data: {"chunk":12}\n\n',
-                      'data: {"chunk":13}\n\n',
-                      'data: {"chunk":14}\n\n',
-                      'data: {"chunk":15}\n\n',
-                      'data: {"chunk":16}\n\n',
-                      'data: {"chunk":17}\n\n',
-                      'data: {"chunk":18}\n\n',
-                      'data: {"chunk":19}\n\n' ], data);
-                    next();
+                    // make sure metrics observation is stopped by waiting for the next cycle
+                    setTimeout(() => {
+                        Assert.equal(20, data.length);
+                        data.forEach((item, index) => {
+                            Assert.ok(new RegExp(`{"type":"HystrixCommand","name":"command:${index}"`).test(item));
+                        });
+                        next();
+                    }, 400);
                 });
             })
             .once('error', () => {
@@ -119,19 +155,19 @@ describe(__filename, () => {
 
             setTimeout(() => {
                 for (var i = 0; i < 10; i++) {
-                    process.emit('hystrix:metrics', `{"chunk":${i}}`);
+                    Hystrix.metricsFactory.getOrCreate({commandKey:`command:${i}`}).markSuccess();
                 }
 
                 setTimeout(() => {
                     for (; i < 20; i++) {
-                        process.emit('hystrix:metrics', {chunk:i});
+                        Hystrix.metricsFactory.getOrCreate({commandKey:`command:${i}`}).markSuccess();
                     }
 
                     setTimeout(() => {
                         req.abort();
-                    }, 100);
-                });
-            }, 400);
+                    }, 300);
+                }, 100);
+            }, 100);
 
         });
 
@@ -139,11 +175,12 @@ describe(__filename, () => {
 
     describe('should proxy the hystrix stream', next => {
         let port;
-        const app = express();
-        app.use('/proxy.stream', proxy());
 
         before(next => {
-            const dashboard = require('..')(app);
+            const dashboard = require('..')({
+                interval: 300
+            });
+            dashboard.use('/proxy.stream', proxy());
 
             let svr = dashboard.listen(() => {
                 port = svr.address().port;
@@ -152,6 +189,11 @@ describe(__filename, () => {
         });
 
         it('test', function (next) {
+            const Hystrix = require('hystrixjs');
+            Hystrix.commandFactory.resetCache();
+            Hystrix.circuitFactory.resetCache();
+            Hystrix.metricsFactory.resetCache();
+
             let data = [];
             const req = Http.get(`http://localhost:${port}/proxy.stream?origin=http://localhost:${port}/hystrix.stream`, res => {
                 const statusCode = res.statusCode;
@@ -165,26 +207,10 @@ describe(__filename, () => {
                     data.push(chunk);
                 })
                 .on('end', () => {
-                    Assert.deepEqual([ 'data: chunk:0\n\n',
-                      'data: chunk:1\n\n',
-                      'data: chunk:2\n\n',
-                      'data: chunk:3\n\n',
-                      'data: chunk:4\n\n',
-                      'data: chunk:5\n\n',
-                      'data: chunk:6\n\n',
-                      'data: chunk:7\n\n',
-                      'data: chunk:8\n\n',
-                      'data: chunk:9\n\n',
-                      'data: chunk:10\n\n',
-                      'data: chunk:11\n\n',
-                      'data: chunk:12\n\n',
-                      'data: chunk:13\n\n',
-                      'data: chunk:14\n\n',
-                      'data: chunk:15\n\n',
-                      'data: chunk:16\n\n',
-                      'data: chunk:17\n\n',
-                      'data: chunk:18\n\n',
-                      'data: chunk:19\n\n' ], data);
+                    Assert.equal(20, data.length);
+                    data.forEach((item, index) => {
+                        Assert.ok(new RegExp(`{"type":"HystrixCommand","name":"command:${index}"`).test(item));
+                    });
                     next();
                 });
             })
@@ -193,19 +219,19 @@ describe(__filename, () => {
 
             setTimeout(() => {
                 for (var i = 0; i < 10; i++) {
-                    process.emit('hystrix:metrics', `chunk:${i}`);
+                    Hystrix.metricsFactory.getOrCreate({commandKey:`command:${i}`}).markSuccess();
                 }
 
                 setTimeout(() => {
                     for (; i < 20; i++) {
-                        process.emit('hystrix:metrics', `chunk:${i}`);
+                        Hystrix.metricsFactory.getOrCreate({commandKey:`command:${i}`}).markSuccess();
                     }
 
                     setTimeout(() => {
                         req.abort();
-                    }, 100);
-                });
-            }, 400);
+                    }, 300);
+                }, 100);
+            }, 100);
 
         });
     });
