@@ -81,6 +81,7 @@ describe(__filename, () => {
         });
 
         it('should get idle ping', function (next) {
+            require('hystrixjs');
             Index.Utils.findHystrixModules = callback => callback([
                 require.resolve('./fixtures/hystrix-mock/mock1.js')
             ]);
@@ -109,11 +110,12 @@ describe(__filename, () => {
         });
     });
 
-    describe('should emit metrics via topic into stream', () => {
+    describe('metrics stream', () => {
         let port;
         const app = express();
 
         before(next => {
+            delete require.cache[require.resolve('hystrixjs')];
             const dashboard = require('..')(app, {
                 interval: 300
             });
@@ -124,7 +126,26 @@ describe(__filename, () => {
             });
         });
 
-        it('test', function (next) {
+        it('should return empty stream and close it due to no metrics available', next => {
+            Http.get(`http://localhost:${port}/hystrix.stream`, res => {
+                const statusCode = res.statusCode;
+                const contentType = res.headers['content-type'];
+
+                Assert.equal(200, statusCode);
+                Assert.equal('text/event-stream;charset=UTF-8', contentType);
+
+                res.setEncoding('utf8');
+                res.on('data', chunk => {
+                    next(new Error('Should not happen'));
+                })
+                .on('end', () => {
+                    next();
+                });
+            })
+            .once('error', next);
+        });
+
+        it('should return stream with metrics', function (next) {
             const Hystrix = require('hystrixjs');
 
             let data = [];

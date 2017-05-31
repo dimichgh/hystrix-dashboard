@@ -44,6 +44,9 @@ module.exports = function configure(app, config) {
                 response.once('close', cleanAll);
                 response.once('finish', cleanAll);
             }
+            else {
+                response.end();
+            }
         });
 
         function publish(data) {
