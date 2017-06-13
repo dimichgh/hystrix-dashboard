@@ -117,7 +117,8 @@ describe(__filename, () => {
         before(next => {
             delete require.cache[require.resolve('hystrixjs')];
             const dashboard = require('..')(app, {
-                interval: 300
+                interval: 300,
+                idleTimeout: 400
             });
 
             let svr = dashboard.listen(() => {
@@ -163,9 +164,10 @@ describe(__filename, () => {
                 .on('end', () => {
                     // make sure metrics observation is stopped by waiting for the next cycle
                     setTimeout(() => {
-                        Assert.equal(20, data.length);
+                        Assert.equal(21, data.length);
                         data.forEach((item, index) => {
-                            Assert.ok(new RegExp(`{"type":"HystrixCommand","name":"command:${index}"`).test(item));
+                            Assert.ok(new RegExp(`{"type":"HystrixCommand","name":"command:${index}"`).test(item) ||
+                            item === ':ping\n\n');
                         });
                         next();
                     }, 400);

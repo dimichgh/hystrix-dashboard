@@ -17,10 +17,6 @@ module.exports = function configure(app, config) {
         response.append('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
         response.append('Pragma', 'no-cache');
 
-        setInterval(() => {
-            response.write(':ping\n\n');
-        }, config && config.idleTimeout || 4000).unref();
-
         // We need to deal with the case when more than one hystrixjs module is used
         // So we start observing them all for now
         findHystrixModules(list => {
@@ -30,6 +26,10 @@ module.exports = function configure(app, config) {
                     return startPublishing(hystrix, config && config.interval, publish);
                 });
 
+                let timer = setInterval(() => {
+                    response.write(':ping\n\n');
+                }, config && config.idleTimeout || 4000).unref();
+
                 const cleanAll = () => {
                     if (publishing) {
                         publishing.forEach(session => {
@@ -37,6 +37,8 @@ module.exports = function configure(app, config) {
                         });
                     }
                     publishing = undefined;
+                    clearInterval(timer);
+                    timer = undefined;
                 };
 
                 request.once('close', cleanAll);
