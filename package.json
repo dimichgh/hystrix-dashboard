@@ -1,6 +1,6 @@
 {
   "name": "hystrix-dashboard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A UI part of java hystrix dashboard for nodejs apps",
   "main": "index.js",
   "scripts": {
