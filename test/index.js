@@ -201,9 +201,9 @@ describe(__filename, () => {
 
         before(next => {
             const dashboard = require('..')({
-                interval: 300
+                interval: 300,
+                proxy: true
             });
-            dashboard.use('/proxy.stream', proxy());
 
             let svr = dashboard.listen(() => {
                 port = svr.address().port;

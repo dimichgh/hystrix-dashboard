@@ -4,8 +4,9 @@ const Wreck = require('wreck');
 const Hoek = require('hoek');
 
 module.exports = function createProxy(config) {
+    config = typeof config === 'object' && config || {};
+
     return function proxy(req, res) {
-        config = config || {};
         const headers = config.headers;
         const requestOptions = Object.assign({}, config);
 

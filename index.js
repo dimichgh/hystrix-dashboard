@@ -57,6 +57,10 @@ module.exports = function configure(app, config) {
 
     });
 
+    if (config && config.proxy) {
+        app.use('/proxy.stream', require('./proxy')(config.proxy));
+    }
+
     app.use('/', express.static(NodePath.join(__dirname, './webapp')));
 
     return app;

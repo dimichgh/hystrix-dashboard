@@ -28,6 +28,7 @@ const dashboard = require('hystrix-dashboard');
 app.use(dashboard({
     idleTimeout: 4000,  // will emit "ping if no data comes within 4 seconds,
     interval: 2000      // interval to collect metrics
+    proxy: true         // enable proxy for stream
 }));
 
 app.listen(8000); //  http://localhost:8000/hystrix
