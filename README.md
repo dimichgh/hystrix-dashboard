@@ -1,6 +1,8 @@
 hystrix-dashboard
 =================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/dimichgh/hystrix-dashboard.svg)](https://greenkeeper.io/)
+
 The module provides UI part from hystrix java dashboard that can be used as part nodejs application.
 For convenience, it also provides a publisher /hystrix.stream and a proxy /proxy.stream
 
