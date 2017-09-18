@@ -36,7 +36,7 @@
     "async": "^2.4.1",
     "hoek": "^4.1.1",
     "rxjs": "^5.4.0",
-    "wreck": "^12.1.0"
+    "wreck": "^13.0.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
