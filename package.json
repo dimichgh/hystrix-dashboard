@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/dimichgh/hystrix-dashboard#readme",
   "devDependencies": {
-    "express": "^4.15.2",
+    "express": "^4.17.0",
     "hystrixjs": "^0.2.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
