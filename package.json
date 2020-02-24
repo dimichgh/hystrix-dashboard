@@ -33,7 +33,7 @@
     "supertest": "^3.0.0"
   },
   "dependencies": {
-    "async": "^2.4.1",
+    "async": "^3.2.0",
     "hoek": "^4.1.1",
     "rxjs": "^5.4.0",
     "wreck": "^12.1.0"
