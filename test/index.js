@@ -98,15 +98,20 @@ describe(__filename, () => {
                 res.on('data', chunk => {
                     data.push(chunk);
                 })
-                .on('end', () => {
-                    Assert.ok(data.length);
-                    data.forEach(d => Assert.equal(':ping\n\n', d));
-                    next();
+                .on('close', () => {
+                    try {
+                        Assert.ok(data.length);
+                        data.forEach(d => Assert.equal(':ping\n\n', d));
+                        next();
+                    }
+                    catch (err) {
+                        next(err);
+                    }
                 });
             })
             .once('error', err => {});
 
-            setTimeout(() => req.abort(), 500);
+            setTimeout(() => req.socket.destroy(), 500);
         });
     });
 
@@ -139,7 +144,7 @@ describe(__filename, () => {
                 res.on('data', chunk => {
                     next(new Error('Should not happen'));
                 })
-                .on('end', () => {
+                .on('close', () => {
                     next();
                 });
             })
@@ -161,7 +166,7 @@ describe(__filename, () => {
                 res.on('data', chunk => {
                     data.push(chunk);
                 })
-                .on('end', () => {
+                .on('close', () => {
                     // make sure metrics observation is stopped by waiting for the next cycle
                     setTimeout(() => {
                         Assert.equal(21, data.length);
@@ -229,7 +234,7 @@ describe(__filename, () => {
                 res.on('data', chunk => {
                     data.push(chunk);
                 })
-                .on('end', () => {
+                .on('close', () => {
                     Assert.equal(20, data.length);
                     data.forEach((item, index) => {
                         Assert.ok(new RegExp(`{"type":"HystrixCommand","name":"command:${index}"`).test(item));
