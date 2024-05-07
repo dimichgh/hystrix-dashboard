@@ -3,7 +3,6 @@
 const Async = require('async');
 const NodePath = require('path');
 const express = require('express');
-const rx = require('rxjs');
 
 module.exports = function configure(app, config) {
     if (app && !app.use) {
@@ -75,6 +74,7 @@ function findHystrixModules(callback) {
 
 function toObservable(hystrix, interval) {
     interval = interval || 2000;
+    const rx = require('rxjs');
 
     return rx.Observable
         .interval(interval)
